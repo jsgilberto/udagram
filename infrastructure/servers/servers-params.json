@@ -2,5 +2,9 @@
     {
         "ParameterKey": "NetworkStackName",
         "ParameterValue": "udagram-network"
+    },
+    {
+        "ParameterKey": "S3BucketName",
+        "ParameterValue": "026581830011-udagram-code/"
     }
 ]

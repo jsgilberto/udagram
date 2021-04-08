@@ -6,6 +6,10 @@ Parameters:
     Description: The name of the stack with the network components
     Type: String
 
+  S3BucketName:
+    Description: The name of the bucket used to pull the code
+    Type: String
+
 Resources:
   LoadBalancerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -42,10 +46,6 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: 0
@@ -58,11 +58,9 @@ Resources:
   WebAppLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
-      LaunchConfigurationName: UdagramWebAppLaunchConfig2
       IamInstanceProfile: !Ref InstancesProfile
       ImageId: ami-013f17f36f8b1fefb
       InstanceType: t3.medium
-      KeyName: udagram-private-servers
       SecurityGroups:
         - Ref: WebServerSecurityGroup
       BlockDeviceMappings:
@@ -74,9 +72,9 @@ Resources:
           #!/bin/bash
           apt-get update -y
           apt-get install apache2 -y
+          sudo apt-get install awscli -y
           systemctl start apache2.service
-          cd /var/www/html
-          echo "Udagram Demo Web Server Up and Running!" > index.html
+          sudo aws s3 cp --recursive s3://${S3BucketName} /var/www/html
 
   InstancesProfile:
     Type: AWS::IAM::InstanceProfile
@@ -191,4 +189,9 @@ Resources:
       ListenerArn: !Ref Listener
       Priority: 1
 
-Outputs: {}
+Outputs:
+  LoadBalancerDNS:
+    Description: DNS name of the Load balancer
+    Value: !Sub http://${LoadBalancer.DNSName}
+    Export: 
+      Name: LoadBalancerDNSName
