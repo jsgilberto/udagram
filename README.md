@@ -23,7 +23,7 @@ To create the servers CloudFormation stack:
 aws cloudformation create-stack --stack-name udagram-servers --template-body file://servers.yml  --parameters file://servers-params.json --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" --region=us-east-1 --profile devops
 ```
 
-To update the network CloudFormation stack:
+To update the servers CloudFormation stack:
 ```sh
-aws cloudformation update-stack --stack-name udagram-servers --template-body file://servers.yml  --parameters file://servers-params.json --region=us-east-1 --profile devops
+aws cloudformation update-stack --stack-name udagram-servers --template-body file://servers.yml  --parameters file://servers-params.json --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" --region=us-east-1 --profile devops
 ```

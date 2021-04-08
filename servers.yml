@@ -58,8 +58,8 @@ Resources:
   WebAppLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
-      LaunchConfigurationName: UdagramWebAppLaunchConfig
-      # IamInstanceProfile: !Ref InstancesProfile # TODO
+      LaunchConfigurationName: UdagramWebAppLaunchConfig2
+      IamInstanceProfile: !Ref InstancesProfile
       ImageId: ami-013f17f36f8b1fefb
       InstanceType: t3.medium
       KeyName: udagram-private-servers
@@ -78,12 +78,39 @@ Resources:
           cd /var/www/html
           echo "Udagram Demo Web Server Up and Running!" > index.html
 
-  # InstancesProfile: # TODO
-  #   Type: AWS::IAM::InstanceProfile
-  #   Properties:
-  #     Path: /
-  #     Roles:
-  #       - rolename
+  InstancesProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - Ref: GetS3ObjectsRole
+  
+  GetS3ObjectsPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: GetS3ObjectsPolicy
+      Roles:
+       - Ref: GetS3ObjectsRole
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - "s3:*"
+            Resource: "*"
+
+  GetS3ObjectsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
 
   WebAppAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
